@@ -1,0 +1,53 @@
+## MySQL Tab補完 トラブルシュート
+
+### 症状① Tabを押しても何も起きない
+
+確認:
+cat -A
+
+Tab入力時に ^I が表示されるか確認。
+
+原因:
+SSHクライアント側でTabキーが正しく送信されていない。
+
+対応:
+端末設定で Tab を「送信(Tab)」に戻す。
+
+
+### 症状② bashでは補完できるが mysql 内だけ補完できない
+
+確認:
+ldd "$(which mysql)" | egrep -i 'readline|edit'
+
+原因:
+mysql クライアントが補完ライブラリ非対応。
+
+対応:
+sudo apt install mysql-client
+
+
+### 症状③ auto-rehash を設定したのに補完が効かない
+
+確認:
+sudo mysql --print-defaults
+
+原因:
+sudo mysql 実行時は /root/.my.cnf を参照するため、
+ユーザー側設定のみでは反映されない。
+
+対応:
+/root/.my.cnf
+
+[mysql]
+auto-rehash
+
+
+### 動作確認
+
+mysqlログイン後:
+
+rehash;
+
+show u<Tab>
+
+候補一覧が表示されれば正常。
